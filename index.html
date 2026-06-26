@@ -7,15 +7,14 @@
   <style>
     :root {
       --bg: #030612;
-      --panel: rgba(8, 14, 32, .78);
-      --line: rgba(69, 231, 255, .42);
-      --cyan: #3eeaff;
+      --panel: rgba(7, 13, 30, .82);
+      --cyan: #44eaff;
       --green: #68ffb0;
       --red: #ff345f;
       --pink: #ff4bd8;
       --gold: #ffd36a;
       --white: #f7fbff;
-      --muted: rgba(227, 236, 255, .68);
+      --muted: rgba(232, 241, 255, .72);
     }
 
     * {
@@ -46,9 +45,10 @@
       min-height: 560px;
       overflow: hidden;
       background:
-        radial-gradient(circle at 18% 18%, rgba(73, 235, 255, .18), transparent 28%),
-        radial-gradient(circle at 82% 42%, rgba(255, 64, 218, .16), transparent 34%),
-        linear-gradient(180deg, #06101f 0%, #030612 52%, #07010f 100%);
+        radial-gradient(circle at 12% 12%, rgba(68, 234, 255, .18), transparent 30%),
+        radial-gradient(circle at 86% 34%, rgba(255, 75, 216, .17), transparent 35%),
+        linear-gradient(180deg, #071426 0%, #030612 58%, #07010f 100%);
+      touch-action: none;
     }
 
     .game-shell::before {
@@ -57,7 +57,7 @@
       inset: 0;
       background:
         linear-gradient(rgba(255,255,255,.035) 50%, rgba(0,0,0,.08) 50%),
-        linear-gradient(90deg, rgba(62,234,255,.04), transparent 20%, transparent 80%, rgba(255,75,216,.05));
+        linear-gradient(90deg, rgba(68,234,255,.04), transparent 20%, transparent 80%, rgba(255,75,216,.05));
       background-size: 100% 4px, 100% 100%;
       mix-blend-mode: screen;
       pointer-events: none;
@@ -72,10 +72,10 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 50% 70%, transparent 40%, rgba(255, 34, 72, .18));
+      background: radial-gradient(circle at 50% 66%, transparent 38%, rgba(255, 34, 72, .2));
       pointer-events: none;
       z-index: 6;
-      animation: pulseRed 1.2s ease-in-out infinite;
+      animation: pulseRed 1s ease-in-out infinite;
     }
 
     @keyframes shake {
@@ -86,8 +86,18 @@
     }
 
     @keyframes pulseRed {
-      0%, 100% { opacity: .18; }
-      50% { opacity: .55; }
+      0%, 100% { opacity: .14; }
+      50% { opacity: .56; }
+    }
+
+    canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+      touch-action: none;
     }
 
     .hud {
@@ -116,7 +126,7 @@
       display: block;
       color: var(--muted);
       font-size: clamp(10px, 2.6vw, 13px);
-      font-weight: 800;
+      font-weight: 900;
       letter-spacing: .08em;
     }
 
@@ -124,9 +134,9 @@
       display: block;
       margin-top: 2px;
       color: var(--white);
-      font-size: clamp(21px, 6.2vw, 32px);
+      font-size: clamp(21px, 6vw, 31px);
       line-height: 1;
-      text-shadow: 0 0 14px rgba(62,234,255,.35);
+      text-shadow: 0 0 14px rgba(68,234,255,.35);
     }
 
     .hp-row {
@@ -136,6 +146,7 @@
     }
 
     .heart {
+      position: relative;
       width: 13px;
       height: 13px;
       background: var(--red);
@@ -162,7 +173,7 @@
       top: calc(max(10px, env(safe-area-inset-top)) + 80px);
       left: 16px;
       right: 16px;
-      min-height: 42px;
+      min-height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -171,7 +182,6 @@
       color: #dffaff;
       font-size: clamp(13px, 3.5vw, 17px);
       font-weight: 900;
-      letter-spacing: .02em;
       border: 1px solid rgba(255, 211, 106, .32);
       border-radius: 16px;
       background: rgba(4, 10, 25, .58);
@@ -180,49 +190,47 @@
       pointer-events: none;
     }
 
-    canvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      display: block;
-      z-index: 1;
-    }
-
     .controls {
       position: absolute;
       left: 0;
       right: 0;
-      bottom: max(12px, env(safe-area-inset-bottom));
+      bottom: max(10px, env(safe-area-inset-bottom));
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      padding: 0 18px;
+      grid-template-columns: 1fr 1fr 1.18fr;
+      gap: 10px;
+      padding: 0 14px;
       z-index: 14;
       pointer-events: none;
     }
 
-    .move-btn {
-      height: clamp(72px, 18vw, 98px);
-      border: 1px solid rgba(94, 238, 255, .55);
-      border-radius: 24px;
+    .control-btn {
+      min-width: 0;
+      height: clamp(60px, 15vw, 82px);
+      border: 1px solid rgba(94, 238, 255, .52);
+      border-radius: 20px;
       color: var(--white);
       background:
-        radial-gradient(circle at 30% 20%, rgba(255,255,255,.22), transparent 28%),
-        linear-gradient(135deg, rgba(20, 39, 70, .94), rgba(8, 12, 28, .88));
-      box-shadow: 0 0 24px rgba(62,234,255,.18), inset 0 0 22px rgba(62,234,255,.1);
-      font-size: clamp(22px, 7vw, 38px);
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,.2), transparent 28%),
+        linear-gradient(135deg, rgba(20, 39, 70, .94), rgba(8, 12, 28, .9));
+      box-shadow: 0 0 22px rgba(68,234,255,.16), inset 0 0 18px rgba(68,234,255,.1);
+      font-size: clamp(17px, 5.2vw, 28px);
       font-weight: 1000;
+      letter-spacing: .03em;
       touch-action: none;
       pointer-events: auto;
     }
 
-    .move-btn:active,
-    .move-btn.active {
-      transform: translateY(2px) scale(.98);
-      background: linear-gradient(135deg, rgba(54, 233, 255, .92), rgba(142, 98, 255, .92));
-      color: #06101d;
-      box-shadow: 0 0 34px rgba(62,234,255,.48);
+    .jump-btn {
+      color: #06101a;
+      background: linear-gradient(135deg, #62f4ff, #8bffb8 48%, #ffd36a);
+      box-shadow: 0 0 34px rgba(104,255,176,.22), inset 0 0 20px rgba(255,255,255,.16);
+    }
+
+    .control-btn:active,
+    .control-btn.active {
+      transform: translateY(2px) scale(.985);
+      filter: brightness(1.16);
+      box-shadow: 0 0 36px rgba(68,234,255,.42);
     }
 
     .flash {
@@ -247,7 +255,7 @@
       position: absolute;
       z-index: 15;
       left: 50%;
-      top: 50%;
+      top: 48%;
       transform: translate(-50%, -50%);
       color: var(--green);
       font-size: clamp(20px, 7vw, 34px);
@@ -294,8 +302,8 @@
       border: 1px solid rgba(92, 236, 255, .42);
       background:
         linear-gradient(180deg, rgba(14, 24, 50, .94), rgba(5, 8, 20, .92)),
-        radial-gradient(circle at 20% 20%, rgba(62,234,255,.18), transparent 34%);
-      box-shadow: 0 0 60px rgba(62,234,255,.22), inset 0 0 28px rgba(255,255,255,.05);
+        radial-gradient(circle at 20% 20%, rgba(68,234,255,.18), transparent 34%);
+      box-shadow: 0 0 60px rgba(68,234,255,.22), inset 0 0 28px rgba(255,255,255,.05);
     }
 
     .kicker {
@@ -309,16 +317,15 @@
     h1 {
       margin: 10px 0 0;
       color: var(--white);
-      font-size: clamp(42px, 12vw, 68px);
+      font-size: clamp(40px, 11.4vw, 66px);
       line-height: .96;
-      letter-spacing: 0;
-      text-shadow: 0 0 24px rgba(255,75,216,.35), 0 0 36px rgba(62,234,255,.24);
+      text-shadow: 0 0 24px rgba(255,75,216,.35), 0 0 36px rgba(68,234,255,.24);
     }
 
     .subtitle {
       margin: 12px 0 0;
       color: #ffdde8;
-      font-size: clamp(20px, 5vw, 28px);
+      font-size: clamp(19px, 5vw, 28px);
       font-weight: 1000;
     }
 
@@ -391,7 +398,7 @@
       .game-shell {
         width: min(100vw, 470px);
         margin: 0 auto;
-        box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 0 70px rgba(62,234,255,.16);
+        box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 0 70px rgba(68,234,255,.16);
       }
     }
 
@@ -401,15 +408,15 @@
         min-height: 34px;
         font-size: 12px;
       }
-      .move-btn {
-        height: 64px;
+      .control-btn {
+        height: 58px;
       }
     }
   </style>
 </head>
 <body>
   <main class="game-shell" id="shell">
-    <canvas id="game" aria-label="闇バイトから逃げろ！ ゲーム画面"></canvas>
+    <canvas id="game" aria-label="闇バイトから逃げろ！ 横スクロール逃走アクション"></canvas>
 
     <section class="hud" aria-label="status">
       <div class="hud-card">
@@ -431,20 +438,21 @@
     <div class="floating" id="floating">+100</div>
 
     <section class="controls" aria-label="mobile controls">
-      <button class="move-btn" id="leftBtn" type="button" aria-label="左へ移動">◀</button>
-      <button class="move-btn" id="rightBtn" type="button" aria-label="右へ移動">▶</button>
+      <button class="control-btn" id="leftBtn" type="button" aria-label="左へ移動">◀</button>
+      <button class="control-btn" id="rightBtn" type="button" aria-label="右へ移動">▶</button>
+      <button class="control-btn jump-btn" id="jumpBtn" type="button" aria-label="ジャンプ">JUMP</button>
     </section>
 
     <section class="overlay" id="startOverlay">
       <div class="modal">
-        <div class="kicker">SAFETY RUNNER</div>
+        <div class="kicker">NEON ESCAPE ACTION</div>
         <h1>闇バイトから逃げろ！</h1>
         <p class="subtitle">そのDM、押したら終わり。</p>
-        <p class="body-copy">怪しい高額報酬の誘いを避けて、相談・通報・ブロックで逃げ切れ。</p>
+        <p class="body-copy">夜道を走り、怪しい勧誘から逃げ切れ。危険ワードをジャンプで避け、相談・通報・ブロックで生き残ろう。</p>
         <p class="notice">これは怪しい勧誘の特徴を学ぶためのミニゲームです。危ないと感じたら、一人で判断せず、信頼できる大人や相談窓口へ。</p>
         <div class="tips">
-          <div class="tip">スマホ：左右ボタン、またはスワイプで移動</div>
-          <div class="tip">PC：← / A、→ / D で移動</div>
+          <div class="tip">スマホ：左右ボタン + JUMP。画面タップ / 上スワイプでもジャンプ</div>
+          <div class="tip">PC：A / ←、D / →、Space / ↑ で操作</div>
         </div>
         <button class="primary-btn" id="startBtn" type="button">START</button>
       </div>
@@ -485,6 +493,7 @@
       const resultStats = document.getElementById("resultStats");
       const leftBtn = document.getElementById("leftBtn");
       const rightBtn = document.getElementById("rightBtn");
+      const jumpBtn = document.getElementById("jumpBtn");
 
       const dangerWords = [
         "即日10万円", "誰でも簡単", "身分証送って", "荷物受け取るだけ", "口座貸して",
@@ -512,32 +521,37 @@
         hp: 3,
         score: 0,
         invincible: 0,
+        hurtBlink: 0,
         shake: 0,
-        spawnTimer: 0,
-        safeTimer: 1.1,
-        roadOffset: 0,
-        neonOffset: 0,
+        scroll: 0,
+        spawnTimer: .8,
+        safeTimer: 1.9,
+        messageTimer: 0,
         items: [],
         particles: [],
         popups: [],
+        decor: [],
         input: { left: false, right: false },
-        swipeStartX: null,
-        swipeLastX: null,
-        messageTimer: 0,
-        currentMessage: "怪しいDMが届き始めた…",
+        touchStartX: null,
+        touchStartY: null,
+        touchLastX: null,
+        groundY: 0,
         player: {
           x: 0,
           y: 0,
-          w: 48,
-          h: 72,
-          speed: 390,
+          w: 50,
+          h: 82,
+          vx: 0,
+          vy: 0,
+          speed: 310,
+          grounded: true,
           run: 0
         }
       };
 
       const shadowPursuer = {
-        distance: 1,
-        pulse: 0,
+        distance: .82,
+        eyePulse: 0,
         warning: 0
       };
 
@@ -563,8 +577,9 @@
         canvas.style.width = state.width + "px";
         canvas.style.height = state.height + "px";
         ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
-        state.player.x = clamp(state.player.x || state.width / 2, 42, state.width - 42);
-        state.player.y = state.height - clamp(state.height * .19, 128, 172);
+        state.groundY = state.height - clamp(state.height * .19, 126, 168);
+        state.player.x = clamp(state.player.x || state.width * .36, state.width * .22, state.width * .62);
+        if (state.player.grounded) state.player.y = state.groundY;
       }
 
       function resetGame() {
@@ -574,16 +589,24 @@
         state.hp = 3;
         state.score = 0;
         state.invincible = 0;
+        state.hurtBlink = 0;
         state.shake = 0;
-        state.spawnTimer = .6;
-        state.safeTimer = 1.35;
+        state.scroll = 0;
+        state.spawnTimer = .7;
+        state.safeTimer = 1.55;
+        state.messageTimer = 0;
         state.items = [];
         state.particles = [];
         state.popups = [];
-        state.player.x = state.width / 2;
-        state.player.y = state.height - clamp(state.height * .19, 128, 172);
-        shadowPursuer.distance = 1;
-        shadowPursuer.pulse = 0;
+        state.decor = [];
+        state.player.x = state.width * .36;
+        state.player.y = state.groundY;
+        state.player.vx = 0;
+        state.player.vy = 0;
+        state.player.grounded = true;
+        state.player.run = 0;
+        shadowPursuer.distance = .82;
+        shadowPursuer.eyePulse = 0;
         shadowPursuer.warning = 0;
         setMessage("怪しいDMが届き始めた…", 3);
         updateHud();
@@ -593,8 +616,7 @@
       }
 
       function updateHud() {
-        const remain = Math.max(0, Math.ceil(60 - state.elapsed));
-        timeText.textContent = String(remain);
+        timeText.textContent = String(Math.max(0, Math.ceil(60 - state.elapsed)));
         scoreText.textContent = String(state.score);
         hpRow.innerHTML = "";
         for (let i = 0; i < 3; i++) {
@@ -605,7 +627,6 @@
       }
 
       function setMessage(text, seconds = 2) {
-        state.currentMessage = text;
         state.messageTimer = seconds;
         phaseMessage.textContent = text;
       }
@@ -628,75 +649,112 @@
       }
 
       function difficulty() {
-        if (state.elapsed < 20) {
-          return { speed: 140, dangerEvery: .92, safeEvery: 1.9, multi: 1 };
-        }
-        if (state.elapsed < 40) {
-          return { speed: 185, dangerEvery: .68, safeEvery: 1.75, multi: 1.2 };
-        }
-        return { speed: 230, dangerEvery: .48, safeEvery: 1.65, multi: 1.45 };
+        if (state.elapsed < 20) return { speed: 245, dangerEvery: 1.25, safeEvery: 2.15, gravity: 1850 };
+        if (state.elapsed < 40) return { speed: 310, dangerEvery: .92, safeEvery: 1.95, gravity: 1950 };
+        return { speed: 375, dangerEvery: .68, safeEvery: 1.78, gravity: 2050 };
+      }
+
+      function jump() {
+        if (state.mode !== "playing") return;
+        if (!state.player.grounded) return;
+        state.player.vy = -760;
+        state.player.grounded = false;
+        addParticles(state.player.x - 12, state.groundY - 12, "#44eaff", 8);
       }
 
       function spawnDanger() {
         const diff = difficulty();
         const label = pick(dangerWords);
-        const w = clamp(label.length * 15 + 54, 118, 212);
+        const typeRoll = Math.random();
+        let kind = "dm";
+        if (typeRoll > .72) kind = "bar";
+        else if (typeRoll > .48) kind = "box";
+        else if (typeRoll > .28) kind = "mail";
+
+        let w = clamp(label.length * 14 + 52, 118, 220);
+        let h = 46;
+        let y = state.groundY - 68;
+        if (kind === "bar") {
+          w = clamp(label.length * 13 + 76, 150, 250);
+          h = 36;
+          y = state.groundY - rand(92, 145);
+        }
+        if (kind === "box") {
+          w = 78;
+          h = 58;
+          y = state.groundY - h / 2;
+        }
         state.items.push({
           type: "danger",
+          kind,
           label,
-          x: rand(18, state.width - w - 18),
-          y: -60,
+          x: state.width + rand(28, 130),
+          y,
           w,
-          h: 46,
-          vy: diff.speed + rand(-8, 28),
-          rot: rand(-.08, .08),
-          pulse: rand(0, 10)
+          h,
+          vx: diff.speed + rand(-10, 34),
+          pulse: rand(0, 10),
+          hit: false
         });
-        if (diff.multi > 1.25 && Math.random() < .34) {
+
+        if (state.elapsed > 42 && Math.random() < .35) {
           const label2 = pick(dangerWords);
-          const w2 = clamp(label2.length * 15 + 54, 118, 212);
           state.items.push({
             type: "danger",
+            kind: "dm",
             label: label2,
-            x: rand(18, state.width - w2 - 18),
-            y: -130,
-            w: w2,
-            h: 46,
-            vy: diff.speed + rand(12, 52),
-            rot: rand(-.08, .08),
-            pulse: rand(0, 10)
+            x: state.width + rand(210, 320),
+            y: state.groundY - rand(106, 180),
+            w: clamp(label2.length * 14 + 52, 118, 210),
+            h: 44,
+            vx: diff.speed + rand(20, 62),
+            pulse: rand(0, 10),
+            hit: false
           });
         }
       }
 
       function spawnSafe() {
         const item = pick(safeItems);
-        const w = clamp(item.label.length * 16 + 48, 92, 172);
+        const w = clamp(item.label.length * 15 + 50, 92, 174);
         state.items.push({
           type: "safe",
+          kind: item.kind,
           label: item.label,
           score: item.score,
-          kind: item.kind,
-          x: rand(18, state.width - w - 18),
-          y: -55,
+          x: state.width + rand(30, 150),
+          y: state.groundY - rand(126, 226),
           w,
           h: 42,
-          vy: difficulty().speed * .86,
-          rot: rand(-.06, .06),
+          vx: difficulty().speed * .92,
           pulse: rand(0, 10)
+        });
+      }
+
+      function addDecor() {
+        if (Math.random() > .022) return;
+        const kind = Math.random() > .5 ? "sign" : "crosswalk";
+        state.decor.push({
+          kind,
+          x: state.width + 40,
+          y: kind === "sign" ? rand(150, state.groundY - 220) : state.groundY + 10,
+          w: kind === "sign" ? rand(72, 110) : rand(90, 150),
+          h: kind === "sign" ? rand(32, 48) : 70,
+          label: kind === "sign" ? pick(["24H", "SNS", "NEON", "路地", "OPEN"]) : "",
+          color: Math.random() > .5 ? "#44eaff" : "#ff4bd8"
         });
       }
 
       function addParticles(x, y, color, count = 12) {
         for (let i = 0; i < count; i++) {
           const a = rand(0, Math.PI * 2);
-          const s = rand(50, 210);
+          const s = rand(50, 230);
           state.particles.push({
             x, y,
             vx: Math.cos(a) * s,
             vy: Math.sin(a) * s,
-            life: rand(.35, .8),
-            max: .8,
+            life: rand(.35, .85),
+            max: .85,
             color,
             r: rand(2, 5)
           });
@@ -707,36 +765,42 @@
         state.popups.push({ text, x, y, color, life: 1, max: 1 });
       }
 
+      function playerBox() {
+        return {
+          x: state.player.x - 20,
+          y: state.player.y - 70,
+          w: 42,
+          h: 66
+        };
+      }
+
+      function hitBox(item) {
+        if (item.type === "danger" && item.kind === "box") {
+          return { x: item.x + 8, y: item.y + 8, w: item.w - 16, h: item.h - 8 };
+        }
+        return { x: item.x + 8, y: item.y + 8, w: item.w - 16, h: item.h - 14 };
+      }
+
       function intersects(a, b) {
         return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
       }
 
-      function playerBox() {
-        return {
-          x: state.player.x - state.player.w / 2,
-          y: state.player.y - state.player.h / 2,
-          w: state.player.w,
-          h: state.player.h
-        };
-      }
-
       function hitDanger(item) {
-        if (state.invincible > 0) {
-          addParticles(item.x + item.w / 2, item.y + item.h / 2, "#79ffce", 18);
-          addPopup("無敵で回避", item.x + item.w / 2, item.y, "#79ffce");
+        if (state.invincible > 0 || state.hurtBlink > 0) {
+          addParticles(item.x + item.w / 2, item.y + item.h / 2, "#79ffce", 16);
+          addPopup("回避", item.x + item.w / 2, item.y, "#79ffce");
           return;
         }
         state.hp -= 1;
-        shadowPursuer.distance = clamp(shadowPursuer.distance - .34, 0, 1);
+        state.hurtBlink = 1.1;
+        shadowPursuer.distance = clamp(shadowPursuer.distance - (state.elapsed > 40 ? .34 : .28), 0, 1);
         shadowPursuer.warning = 1.6;
         state.shake = .35;
         redFlash();
         addParticles(item.x + item.w / 2, item.y + item.h / 2, "#ff345f", 24);
         addPopup("-HP", item.x + item.w / 2, item.y, "#ff5d78");
         setMessage("追跡者が近づいている…", 2.2);
-        if (state.hp <= 0) {
-          endGame(false);
-        }
+        if (state.hp <= 0) endGame(false);
       }
 
       function collectSafe(item) {
@@ -755,7 +819,7 @@
         addParticles(item.x + item.w / 2, item.y + item.h / 2, "#68ffb0", 22);
         addPopup(text, item.x + item.w / 2, item.y, "#68ffb0");
         showFloating(text, true);
-        setMessage("いい判断。危ない誘いから距離を取った！", 1.8);
+        setMessage("いい判断。安全な行動で距離を取った！", 1.8);
         updateHud();
       }
 
@@ -769,7 +833,7 @@
         resultSubtitle.textContent = clear ? "安全エリアに到着" : "危険サインを見逃した";
         resultBody.textContent = clear
           ? "『簡単・高額・匿名・秘密』は危険サイン。怪しいと思ったら、一人で判断せず相談しよう。"
-          : "『身分証送って』『口座貸して』『誰にも言うな』この言葉が出たら要注意。次は安全アイテムを集めて逃げ切ろう。";
+          : "『身分証送って』『口座貸して』『誰にも言うな』この言葉が出たら要注意。次はジャンプで危険ワードを避け、安全アイテムを集めて逃げ切ろう。";
         resultStats.innerHTML = `
           <div class="tip">SCORE：${state.score}</div>
           <div class="tip">逃走時間：${Math.min(60, Math.floor(state.elapsed))}秒</div>
@@ -780,13 +844,15 @@
 
       function update(dt) {
         if (state.mode !== "playing") return;
+
+        const diff = difficulty();
         state.elapsed += dt;
-        state.roadOffset += dt * (260 + state.elapsed * 2.4);
-        state.neonOffset += dt * 36;
-        state.player.run += dt * 10;
-        shadowPursuer.pulse += dt * 5;
+        state.scroll += diff.speed * dt;
+        state.player.run += dt * (state.player.grounded ? 11 : 5);
+        shadowPursuer.eyePulse += dt * 7;
         shadowPursuer.warning = Math.max(0, shadowPursuer.warning - dt);
         state.invincible = Math.max(0, state.invincible - dt);
+        state.hurtBlink = Math.max(0, state.hurtBlink - dt);
         state.shake = Math.max(0, state.shake - dt);
 
         if (state.elapsed >= 60) {
@@ -808,33 +874,52 @@
         }
 
         const dir = (state.input.left ? -1 : 0) + (state.input.right ? 1 : 0);
-        state.player.x += dir * state.player.speed * dt;
-        state.player.x = clamp(state.player.x, 42, state.width - 42);
+        state.player.vx += dir * state.player.speed * 5 * dt;
+        state.player.vx *= .82;
+        state.player.x += state.player.vx * dt;
+        state.player.x = clamp(state.player.x, state.width * .21, state.width * .64);
 
-        const diff = difficulty();
+        state.player.vy += diff.gravity * dt;
+        state.player.y += state.player.vy * dt;
+        if (state.player.y >= state.groundY) {
+          state.player.y = state.groundY;
+          state.player.vy = 0;
+          state.player.grounded = true;
+        } else {
+          state.player.grounded = false;
+        }
+
         state.spawnTimer -= dt;
         state.safeTimer -= dt;
         if (state.spawnTimer <= 0) {
           spawnDanger();
-          state.spawnTimer = diff.dangerEvery * rand(.72, 1.15);
+          state.spawnTimer = diff.dangerEvery * rand(.74, 1.15);
         }
         if (state.safeTimer <= 0) {
           spawnSafe();
-          state.safeTimer = diff.safeEvery * rand(.8, 1.25);
+          state.safeTimer = diff.safeEvery * rand(.85, 1.35);
         }
+        addDecor();
 
         const box = playerBox();
         for (let i = state.items.length - 1; i >= 0; i--) {
           const item = state.items[i];
-          item.y += item.vy * dt;
+          item.x -= item.vx * dt;
           item.pulse += dt * 4;
-          if (intersects(box, item)) {
+          if (!item.hit && intersects(box, hitBox(item))) {
+            item.hit = true;
             state.items.splice(i, 1);
             if (item.type === "danger") hitDanger(item);
             else collectSafe(item);
-          } else if (item.y > state.height + 90) {
+          } else if (item.x + item.w < -60) {
             state.items.splice(i, 1);
           }
+        }
+
+        for (let i = state.decor.length - 1; i >= 0; i--) {
+          const d = state.decor[i];
+          d.x -= (d.kind === "sign" ? diff.speed * .55 : diff.speed * 1.15) * dt;
+          if (d.x + d.w < -80) state.decor.splice(i, 1);
         }
 
         for (let i = state.particles.length - 1; i >= 0; i--) {
@@ -873,42 +958,46 @@
         const h = state.height;
         const late = state.elapsed > 50;
         const g = ctx.createLinearGradient(0, 0, 0, h);
-        g.addColorStop(0, late ? "#160817" : "#061427");
-        g.addColorStop(.48, "#030612");
+        g.addColorStop(0, late ? "#170817" : "#071528");
+        g.addColorStop(.5, "#030612");
         g.addColorStop(1, "#08010e");
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, w, h);
 
+        drawFarBuildings();
+        drawDecor();
+        drawRoad();
+        drawFog();
+      }
+
+      function drawFarBuildings() {
+        const w = state.width;
+        const h = state.height;
+        const offset = (state.scroll * .18) % 180;
         ctx.save();
-        ctx.globalAlpha = .72;
-        const buildingCount = 7;
-        for (let i = 0; i < buildingCount; i++) {
-          const bw = w / buildingCount + 12;
-          const x = i * (w / buildingCount) - 6;
-          const bh = h * randStatic(i, .24, .48);
-          const y = 92 + (i % 2) * 24;
+        for (let i = -1; i < Math.ceil(w / 90) + 3; i++) {
+          const x = i * 90 - offset;
+          const bh = 190 + ((i * 47) % 110);
+          const y = state.groundY - 260 - (i % 3) * 26;
           ctx.fillStyle = i % 2 ? "#07101d" : "#050a15";
-          ctx.fillRect(x, y, bw, bh);
-          for (let wy = y + 22; wy < y + bh - 18; wy += 34) {
-            for (let wx = x + 13; wx < x + bw - 12; wx += 26) {
-              if ((Math.floor(wx + wy + i * 7) % 4) === 0) {
-                ctx.fillStyle = i % 3 ? "rgba(63,232,255,.22)" : "rgba(255,75,216,.22)";
+          ctx.fillRect(x, y, 78, bh);
+          for (let wy = y + 22; wy < y + bh - 16; wy += 34) {
+            for (let wx = x + 12; wx < x + 66; wx += 22) {
+              if ((Math.floor(wx + wy + i * 11) % 4) === 0) {
+                ctx.fillStyle = i % 3 ? "rgba(68,234,255,.22)" : "rgba(255,75,216,.22)";
                 ctx.fillRect(wx, wy, 9, 4);
               }
             }
           }
         }
+
+        const signOffset = (state.scroll * .42) % 340;
+        for (let i = -1; i < 5; i++) {
+          const x = i * 340 - signOffset + 30;
+          drawNeonSign(x, state.groundY - 255 - (i % 2) * 42, i % 2 ? "SAFE" : "SNS", i % 2 ? "#68ffb0" : "#ff4bd8");
+        }
+        drawStreetLight(w - ((state.scroll * .75) % (w + 160)), state.groundY - 252);
         ctx.restore();
-
-        drawNeonSign(22, 150 + Math.sin(state.neonOffset * .05) * 4, "DM", "#ff4bd8");
-        drawNeonSign(w - 114, 204, "SAFE", "#68ffb0");
-        drawStreetLight(w - 58, 140);
-        drawRoad();
-      }
-
-      function randStatic(seed, min, max) {
-        const n = Math.sin(seed * 989.123) * 43758.545;
-        return min + (n - Math.floor(n)) * (max - min);
       }
 
       function drawNeonSign(x, y, text, color) {
@@ -917,13 +1006,13 @@
         ctx.shadowBlur = 18;
         ctx.strokeStyle = color;
         ctx.lineWidth = 2;
-        roundRect(x, y, 88, 38, 9);
+        roundRect(x, y, 86, 38, 9);
         ctx.stroke();
         ctx.fillStyle = color;
-        ctx.font = "900 18px system-ui, sans-serif";
+        ctx.font = "900 17px system-ui, sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(text, x + 44, y + 19);
+        ctx.fillText(text, x + 43, y + 19);
         ctx.restore();
       }
 
@@ -933,10 +1022,10 @@
         ctx.lineWidth = 4;
         ctx.beginPath();
         ctx.moveTo(x, y);
-        ctx.lineTo(x, state.height * .7);
+        ctx.lineTo(x, state.groundY + 6);
         ctx.stroke();
-        const glow = ctx.createRadialGradient(x - 34, y + 12, 0, x - 34, y + 12, 120);
-        glow.addColorStop(0, "rgba(255,227,145,.22)");
+        const glow = ctx.createRadialGradient(x - 32, y + 12, 0, x - 32, y + 12, 120);
+        glow.addColorStop(0, "rgba(255,227,145,.24)");
         glow.addColorStop(1, "transparent");
         ctx.fillStyle = glow;
         ctx.fillRect(x - 160, y - 70, 240, 190);
@@ -947,165 +1036,212 @@
         ctx.restore();
       }
 
+      function drawDecor() {
+        for (const d of state.decor) {
+          ctx.save();
+          if (d.kind === "sign") {
+            drawNeonSign(d.x, d.y, d.label, d.color);
+          } else {
+            ctx.globalAlpha = .55;
+            ctx.fillStyle = "rgba(255,255,255,.72)";
+            for (let i = 0; i < 5; i++) {
+              ctx.fillRect(d.x + i * 26, state.groundY + 12, 14, 50);
+            }
+          }
+          ctx.restore();
+        }
+      }
+
       function drawRoad() {
         const w = state.width;
         const h = state.height;
-        const horizon = h * .33;
-        const roadTop = w * .18;
         ctx.save();
-        ctx.fillStyle = "#030714";
-        ctx.beginPath();
-        ctx.moveTo(w / 2 - roadTop, horizon);
-        ctx.lineTo(w / 2 + roadTop, horizon);
-        ctx.lineTo(w + 70, h);
-        ctx.lineTo(-70, h);
-        ctx.closePath();
-        ctx.fill();
+        const road = ctx.createLinearGradient(0, state.groundY - 12, 0, h);
+        road.addColorStop(0, "#10131d");
+        road.addColorStop(.5, "#070b14");
+        road.addColorStop(1, "#03040a");
+        ctx.fillStyle = road;
+        ctx.fillRect(0, state.groundY - 12, w, h - state.groundY + 12);
 
-        ctx.strokeStyle = "rgba(69,231,255,.22)";
+        ctx.strokeStyle = "rgba(68,234,255,.34)";
         ctx.lineWidth = 2;
-        for (let i = 0; i < 18; i++) {
-          const y = horizon + ((state.roadOffset + i * 48) % (h - horizon + 120));
-          const scale = (y - horizon) / (h - horizon);
-          ctx.beginPath();
-          ctx.moveTo(w / 2 - roadTop - scale * 280, y);
-          ctx.lineTo(w / 2 + roadTop + scale * 280, y);
-          ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, state.groundY - 12);
+        ctx.lineTo(w, state.groundY - 12);
+        ctx.stroke();
+
+        const lineOffset = state.scroll % 110;
+        for (let x = -lineOffset; x < w + 120; x += 110) {
+          ctx.fillStyle = "rgba(255,255,255,.58)";
+          ctx.fillRect(x, state.groundY + 48, 52, 5);
         }
 
-        ctx.strokeStyle = "rgba(255,255,255,.45)";
-        ctx.lineWidth = 3;
-        for (let i = 0; i < 8; i++) {
-          const y = horizon + ((state.roadOffset * 1.4 + i * 150) % (h - horizon + 180));
-          const scale = .25 + (y - horizon) / (h - horizon);
-          const len = 32 + scale * 42;
+        const gridOffset = state.scroll % 34;
+        ctx.strokeStyle = "rgba(255,75,216,.13)";
+        ctx.lineWidth = 1;
+        for (let x = -gridOffset; x < w + 40; x += 34) {
           ctx.beginPath();
-          ctx.moveTo(w / 2, y);
-          ctx.lineTo(w / 2, y + len);
+          ctx.moveTo(x, state.groundY);
+          ctx.lineTo(x - 80, h);
           ctx.stroke();
         }
         ctx.restore();
       }
 
+      function drawFog() {
+        ctx.save();
+        ctx.globalAlpha = .24;
+        for (let i = 0; i < 4; i++) {
+          const x = ((i * 170 - state.scroll * .28) % (state.width + 260)) - 130;
+          const y = state.groundY - 96 - i * 24;
+          const grad = ctx.createRadialGradient(x, y, 0, x, y, 160);
+          grad.addColorStop(0, "rgba(150, 210, 255, .16)");
+          grad.addColorStop(1, "transparent");
+          ctx.fillStyle = grad;
+          ctx.fillRect(x - 160, y - 80, 320, 160);
+        }
+        ctx.restore();
+      }
+
       function drawPursuer() {
-        const w = state.width;
-        const h = state.height;
-        const closeness = 1 - shadowPursuer.distance;
-        const y = h * (.48 + .23 * shadowPursuer.distance);
-        const scale = .58 + closeness * 1.25;
-        const x = w * (.5 + Math.sin(state.elapsed * 1.2) * .04);
-        const eyeGlow = closeness > .62 || state.elapsed > 50;
+        const close = 1 - shadowPursuer.distance;
+        const x = state.player.x - (112 + shadowPursuer.distance * 120);
+        const y = state.groundY;
+        const scale = .82 + close * .58;
+        const eyeGlow = close > .55 || state.elapsed > 50;
 
         ctx.save();
         ctx.translate(x, y);
         ctx.scale(scale, scale);
-        ctx.globalAlpha = .54 + closeness * .38;
+        ctx.globalAlpha = .72 + close * .24;
         ctx.shadowColor = eyeGlow ? "#ff174f" : "#000";
         ctx.shadowBlur = eyeGlow ? 28 : 14;
-        ctx.fillStyle = "rgba(0,0,0,.62)";
+
+        ctx.fillStyle = "rgba(0,0,0,.52)";
         ctx.beginPath();
-        ctx.ellipse(0, 74, 48, 12, 0, 0, Math.PI * 2);
+        ctx.ellipse(0, 8, 44, 9, 0, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.fillStyle = "#050506";
-        roundRect(-30, -8, 60, 92, 18);
+        roundRect(-27, -92, 54, 92, 16);
         ctx.fill();
         ctx.fillStyle = "#090a10";
-        roundRect(-38, 12, 76, 100, 12);
+        roundRect(-36, -72, 72, 102, 12);
         ctx.fill();
-        ctx.fillStyle = "#0e1118";
-        ctx.fillRect(-8, 34, 16, 58);
+        ctx.fillStyle = "#0d1018";
+        ctx.fillRect(-8, -48, 16, 64);
 
         ctx.fillStyle = "#101216";
         ctx.beginPath();
-        ctx.arc(0, -34, 24, 0, Math.PI * 2);
+        ctx.arc(0, -113, 23, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = "rgba(0,0,0,.64)";
-        ctx.fillRect(-28, -42, 56, 22);
+        ctx.fillStyle = "rgba(0,0,0,.72)";
+        ctx.fillRect(-27, -123, 54, 21);
 
         ctx.fillStyle = eyeGlow ? "#ff345f" : "#c4d2e8";
-        ctx.fillRect(-13, -31, 9, 3);
-        ctx.fillRect(5, -31, 9, 3);
+        ctx.fillRect(-13, -111, 9, 3);
+        ctx.fillRect(5, -111, 9, 3);
+
+        ctx.strokeStyle = "#050506";
+        ctx.lineWidth = 7;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(-20, -60);
+        ctx.lineTo(-34, -20);
+        ctx.moveTo(20, -60);
+        ctx.lineTo(34, -30);
+        ctx.stroke();
 
         ctx.fillStyle = "#101319";
-        roundRect(26, 22, 14, 28, 4);
+        roundRect(28, -42, 13, 27, 4);
         ctx.fill();
-        ctx.fillStyle = "#3eeaff";
-        ctx.fillRect(29, 26, 8, 13);
+        ctx.fillStyle = "#44eaff";
+        ctx.fillRect(31, -38, 7, 12);
         ctx.restore();
       }
 
       function drawPlayer() {
         const p = state.player;
         const inv = state.invincible > 0;
-        const bob = Math.sin(p.run) * 3;
-        const leg = Math.sin(p.run) * 8;
+        const hurtInvisible = state.hurtBlink > 0 && Math.floor(state.hurtBlink * 14) % 2 === 0;
+        if (hurtInvisible) return;
+
+        const running = p.grounded;
+        const stride = Math.sin(p.run);
+        const bodyLean = p.grounded ? -.16 : .15;
+        const jumpTuck = p.grounded ? 0 : 1;
 
         ctx.save();
-        ctx.translate(p.x, p.y + bob);
+        ctx.translate(p.x, p.y);
+        ctx.rotate(bodyLean);
         ctx.shadowColor = inv ? "#68ffb0" : "#ffffff";
         ctx.shadowBlur = inv ? 28 : 16;
+
         ctx.fillStyle = "rgba(0,0,0,.34)";
         ctx.beginPath();
-        ctx.ellipse(0, 40, 38, 9, 0, 0, Math.PI * 2);
+        ctx.ellipse(0, 8, 38, 9, 0, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.strokeStyle = "#1a2234";
         ctx.lineWidth = 8;
         ctx.lineCap = "round";
         ctx.beginPath();
-        ctx.moveTo(-8, 18);
-        ctx.lineTo(-20 + leg, 44);
-        ctx.moveTo(10, 18);
-        ctx.lineTo(24 - leg, 44);
+        ctx.moveTo(-7, -26);
+        ctx.lineTo(-18 + stride * 11, -2 - jumpTuck * 12);
+        ctx.lineTo(-30 + stride * 9, 8 - jumpTuck * 8);
+        ctx.moveTo(12, -24);
+        ctx.lineTo(24 - stride * 11, 0 - jumpTuck * 16);
+        ctx.lineTo(35 - stride * 8, 8 - jumpTuck * 10);
         ctx.stroke();
+
         ctx.strokeStyle = "#f8fbff";
         ctx.lineWidth = 5;
         ctx.beginPath();
-        ctx.moveTo(-20 + leg, 44);
-        ctx.lineTo(-32 + leg, 44);
-        ctx.moveTo(24 - leg, 44);
-        ctx.lineTo(36 - leg, 44);
+        ctx.moveTo(-30 + stride * 9, 8 - jumpTuck * 8);
+        ctx.lineTo(-42 + stride * 9, 8 - jumpTuck * 8);
+        ctx.moveTo(35 - stride * 8, 8 - jumpTuck * 10);
+        ctx.lineTo(48 - stride * 8, 8 - jumpTuck * 10);
         ctx.stroke();
 
         ctx.fillStyle = "#f9fbff";
-        roundRect(-22, -22, 44, 48, 14);
+        roundRect(-22, -83, 46, 56, 15);
         ctx.fill();
         ctx.fillStyle = "#e5edf8";
         ctx.beginPath();
-        ctx.moveTo(-23, -20);
-        ctx.quadraticCurveTo(0, -48, 24, -20);
-        ctx.lineTo(14, -12);
-        ctx.quadraticCurveTo(0, -28, -14, -12);
+        ctx.moveTo(-24, -80);
+        ctx.quadraticCurveTo(0, -111, 27, -80);
+        ctx.lineTo(15, -68);
+        ctx.quadraticCurveTo(0, -88, -15, -68);
         ctx.closePath();
         ctx.fill();
 
         ctx.fillStyle = "#f0c8a8";
         ctx.beginPath();
-        ctx.arc(0, -25, 13, 0, Math.PI * 2);
+        ctx.arc(2, -88, 13, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = "#111827";
-        ctx.fillRect(-9, -29, 18, 5);
+        ctx.fillRect(-8, -93, 20, 5);
 
         ctx.strokeStyle = "#f8fbff";
         ctx.lineWidth = 6;
         ctx.beginPath();
-        ctx.moveTo(-20, -2);
-        ctx.lineTo(-34, 14);
-        ctx.moveTo(20, -2);
-        ctx.lineTo(34, 12);
+        ctx.moveTo(-18, -60);
+        ctx.lineTo(-35, -42);
+        ctx.moveTo(21, -60);
+        ctx.lineTo(42, -46);
         ctx.stroke();
+
         ctx.fillStyle = "#101827";
-        roundRect(29, 2, 12, 19, 4);
+        roundRect(36, -56, 13, 20, 4);
         ctx.fill();
         ctx.fillStyle = "#44eaff";
-        ctx.fillRect(32, 6, 6, 9);
+        ctx.fillRect(39, -52, 7, 10);
 
         if (inv) {
           ctx.strokeStyle = "rgba(104,255,176,.9)";
           ctx.lineWidth = 3;
           ctx.beginPath();
-          ctx.ellipse(0, 0, 42, 62, 0, 0, Math.PI * 2);
+          ctx.ellipse(0, -44, 44, 66, 0, 0, Math.PI * 2);
           ctx.stroke();
         }
         ctx.restore();
@@ -1114,17 +1250,27 @@
       function drawItem(item) {
         ctx.save();
         ctx.translate(item.x + item.w / 2, item.y + item.h / 2);
-        ctx.rotate(item.rot + Math.sin(item.pulse) * .025);
-        const x = -item.w / 2;
-        const y = -item.h / 2;
         const isDanger = item.type === "danger";
         const glow = isDanger ? "#ff345f" : "#68ffb0";
         ctx.shadowColor = glow;
         ctx.shadowBlur = isDanger ? 22 : 18;
+        if (isDanger && item.kind === "box") {
+          drawSuspiciousBox(item);
+        } else if (isDanger && item.kind === "bar") {
+          drawWarningBar(item);
+        } else {
+          drawMessageBubble(item, isDanger);
+        }
+        ctx.restore();
+      }
+
+      function drawMessageBubble(item, isDanger) {
+        const x = -item.w / 2;
+        const y = -item.h / 2;
         const grad = ctx.createLinearGradient(x, y, x + item.w, y + item.h);
         if (isDanger) {
-          grad.addColorStop(0, "rgba(72, 11, 34, .95)");
-          grad.addColorStop(.55, "rgba(38, 9, 36, .95)");
+          grad.addColorStop(0, "rgba(78, 11, 35, .95)");
+          grad.addColorStop(.58, "rgba(38, 9, 36, .95)");
           grad.addColorStop(1, "rgba(150, 25, 90, .92)");
         } else {
           grad.addColorStop(0, "rgba(16, 60, 78, .96)");
@@ -1135,18 +1281,48 @@
         roundRect(x, y, item.w, item.h, 13);
         ctx.fill();
         ctx.lineWidth = 2;
-        ctx.strokeStyle = isDanger ? "rgba(255,74,112,.8)" : "rgba(139,255,210,.8)";
+        ctx.strokeStyle = isDanger ? "rgba(255,74,112,.82)" : "rgba(139,255,210,.86)";
         ctx.stroke();
         ctx.fillStyle = isDanger ? "#ffeff4" : "#06121a";
         ctx.font = "900 15px system-ui, sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(item.label, 0, 1);
-        ctx.fillStyle = isDanger ? "rgba(255,52,95,.95)" : "rgba(62,234,255,.95)";
+        ctx.fillStyle = isDanger ? "rgba(255,52,95,.95)" : "rgba(68,234,255,.95)";
         ctx.beginPath();
         ctx.arc(x + 18, y + 14, 4, 0, Math.PI * 2);
         ctx.fill();
-        ctx.restore();
+      }
+
+      function drawWarningBar(item) {
+        const x = -item.w / 2;
+        const y = -item.h / 2;
+        ctx.fillStyle = "rgba(255,52,95,.92)";
+        roundRect(x, y, item.w, item.h, 10);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,.6)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.fillStyle = "#14030a";
+        ctx.font = "1000 15px system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(item.label, 0, 1);
+      }
+
+      function drawSuspiciousBox(item) {
+        const x = -item.w / 2;
+        const y = -item.h / 2;
+        ctx.fillStyle = "rgba(55, 19, 28, .96)";
+        roundRect(x, y, item.w, item.h, 10);
+        ctx.fill();
+        ctx.fillStyle = "rgba(255, 211, 106, .72)";
+        ctx.fillRect(x + 10, y + 10, item.w - 20, 7);
+        ctx.fillStyle = "#ffeff4";
+        ctx.font = "900 12px system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("怪しい荷物", 0, 8);
       }
 
       function drawParticles() {
@@ -1176,6 +1352,23 @@
         ctx.restore();
       }
 
+      function drawDistanceGauge() {
+        const x = 18;
+        const y = state.height - clamp(state.height * .19, 126, 168) - 34;
+        const w = 118;
+        ctx.save();
+        ctx.fillStyle = "rgba(3,8,20,.64)";
+        roundRect(x, y, w, 10, 6);
+        ctx.fill();
+        ctx.fillStyle = shadowPursuer.distance < .35 ? "#ff345f" : "#68ffb0";
+        roundRect(x, y, w * shadowPursuer.distance, 10, 6);
+        ctx.fill();
+        ctx.fillStyle = "rgba(232,241,255,.76)";
+        ctx.font = "900 10px system-ui, sans-serif";
+        ctx.fillText("追跡距離", x, y - 5);
+        ctx.restore();
+      }
+
       function draw() {
         ctx.save();
         if (state.shake > 0) {
@@ -1187,16 +1380,17 @@
         drawPlayer();
         drawParticles();
         drawPopups();
+        drawDistanceGauge();
         if (state.mode === "over") {
-          const g = ctx.createRadialGradient(state.width / 2, state.height * .62, 30, state.width / 2, state.height * .62, state.height);
-          g.addColorStop(0, "rgba(0,0,0,.2)");
-          g.addColorStop(1, "rgba(0,0,0,.86)");
+          const g = ctx.createRadialGradient(state.player.x - 80, state.groundY - 80, 30, state.player.x - 80, state.groundY - 80, state.height);
+          g.addColorStop(0, "rgba(0,0,0,.18)");
+          g.addColorStop(1, "rgba(0,0,0,.88)");
           ctx.fillStyle = g;
           ctx.fillRect(0, 0, state.width, state.height);
         }
         if (state.mode === "clear") {
           const g = ctx.createRadialGradient(state.width / 2, state.height * .45, 0, state.width / 2, state.height * .45, state.height * .62);
-          g.addColorStop(0, "rgba(104,255,176,.2)");
+          g.addColorStop(0, "rgba(104,255,176,.22)");
           g.addColorStop(1, "transparent");
           ctx.fillStyle = g;
           ctx.fillRect(0, 0, state.width, state.height);
@@ -1234,12 +1428,24 @@
 
       bindHold(leftBtn, "left");
       bindHold(rightBtn, "right");
+      jumpBtn.addEventListener("pointerdown", e => {
+        e.preventDefault();
+        jump();
+        jumpBtn.classList.add("active");
+      });
+      jumpBtn.addEventListener("pointerup", e => {
+        e.preventDefault();
+        jumpBtn.classList.remove("active");
+      });
+      jumpBtn.addEventListener("pointercancel", () => jumpBtn.classList.remove("active"));
+      jumpBtn.addEventListener("pointerleave", () => jumpBtn.classList.remove("active"));
 
       window.addEventListener("keydown", e => {
-        if (["ArrowLeft", "ArrowRight", "KeyA", "KeyD", "Enter", "Space"].includes(e.code)) e.preventDefault();
+        if (["ArrowLeft", "ArrowRight", "KeyA", "KeyD", "Space", "ArrowUp", "Enter"].includes(e.code)) e.preventDefault();
         if (e.code === "ArrowLeft" || e.code === "KeyA") state.input.left = true;
         if (e.code === "ArrowRight" || e.code === "KeyD") state.input.right = true;
-        if ((e.code === "Enter" || e.code === "Space") && state.mode !== "playing") resetGame();
+        if (e.code === "Space" || e.code === "ArrowUp") jump();
+        if (e.code === "Enter" && state.mode !== "playing") resetGame();
       }, { passive: false });
 
       window.addEventListener("keyup", e => {
@@ -1248,20 +1454,35 @@
       });
 
       shell.addEventListener("pointerdown", e => {
-        state.swipeStartX = e.clientX;
-        state.swipeLastX = e.clientX;
+        if (e.target.closest("button")) return;
+        state.touchStartX = e.clientX;
+        state.touchStartY = e.clientY;
+        state.touchLastX = e.clientX;
       });
 
       shell.addEventListener("pointermove", e => {
-        if (state.mode !== "playing" || state.swipeStartX === null) return;
-        const dx = e.clientX - state.swipeLastX;
-        state.player.x = clamp(state.player.x + dx * 1.1, 42, state.width - 42);
-        state.swipeLastX = e.clientX;
+        if (state.mode !== "playing" || state.touchStartX === null) return;
+        const dx = e.clientX - state.touchLastX;
+        const dy = e.clientY - state.touchStartY;
+        if (Math.abs(dx) > 1) {
+          state.player.x = clamp(state.player.x + dx * 1.04, state.width * .21, state.width * .64);
+        }
+        if (dy < -34) {
+          jump();
+          state.touchStartY = e.clientY;
+        }
+        state.touchLastX = e.clientX;
       });
 
-      shell.addEventListener("pointerup", () => {
-        state.swipeStartX = null;
-        state.swipeLastX = null;
+      shell.addEventListener("pointerup", e => {
+        if (!e.target.closest("button") && state.touchStartX !== null) {
+          const dx = Math.abs(e.clientX - state.touchStartX);
+          const dy = state.touchStartY - e.clientY;
+          if (dx < 12 && Math.abs(dy) < 18) jump();
+        }
+        state.touchStartX = null;
+        state.touchStartY = null;
+        state.touchLastX = null;
       });
 
       document.getElementById("startBtn").addEventListener("click", resetGame);
