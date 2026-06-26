@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>闇バイトから逃げろ！</title>
+  <style>
+    :root {
+      --bg: #030612;
+      --panel: rgba(8, 14, 32, .78);
+      --line: rgba(69, 231, 255, .42);
+      --cyan: #3eeaff;
+      --green: #68ffb0;
+      --red: #ff345f;
+      --pink: #ff4bd8;
+      --gold: #ffd36a;
+      --white: #f7fbff;
+      --muted: rgba(227, 236, 255, .68);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      background: #01030a;
+      color: var(--white);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Yu Gothic", "Meiryo", sans-serif;
+    }
+
+    body {
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    .game-shell {
+      position: relative;
+      width: 100vw;
+      height: 100dvh;
+      min-height: 560px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(73, 235, 255, .18), transparent 28%),
+        radial-gradient(circle at 82% 42%, rgba(255, 64, 218, .16), transparent 34%),
+        linear-gradient(180deg, #06101f 0%, #030612 52%, #07010f 100%);
+    }
+
+    .game-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(rgba(255,255,255,.035) 50%, rgba(0,0,0,.08) 50%),
+        linear-gradient(90deg, rgba(62,234,255,.04), transparent 20%, transparent 80%, rgba(255,75,216,.05));
+      background-size: 100% 4px, 100% 100%;
+      mix-blend-mode: screen;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .game-shell.alert {
+      animation: shake .24s linear 2;
+    }
+
+    .game-shell.danger-phase::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 70%, transparent 40%, rgba(255, 34, 72, .18));
+      pointer-events: none;
+      z-index: 6;
+      animation: pulseRed 1.2s ease-in-out infinite;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translate3d(0,0,0); }
+      25% { transform: translate3d(-5px, 3px, 0); }
+      50% { transform: translate3d(4px, -2px, 0); }
+      75% { transform: translate3d(-2px, -3px, 0); }
+    }
+
+    @keyframes pulseRed {
+      0%, 100% { opacity: .18; }
+      50% { opacity: .55; }
+    }
+
+    .hud {
+      position: absolute;
+      top: max(10px, env(safe-area-inset-top));
+      left: 12px;
+      right: 12px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      z-index: 12;
+      pointer-events: none;
+    }
+
+    .hud-card {
+      min-width: 0;
+      padding: 9px 10px;
+      border: 1px solid rgba(93, 237, 255, .36);
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(12, 24, 48, .84), rgba(8, 12, 28, .68));
+      box-shadow: 0 0 22px rgba(42, 227, 255, .12), inset 0 0 18px rgba(255,255,255,.04);
+      backdrop-filter: blur(10px);
+    }
+
+    .hud-card span {
+      display: block;
+      color: var(--muted);
+      font-size: clamp(10px, 2.6vw, 13px);
+      font-weight: 800;
+      letter-spacing: .08em;
+    }
+
+    .hud-card strong {
+      display: block;
+      margin-top: 2px;
+      color: var(--white);
+      font-size: clamp(21px, 6.2vw, 32px);
+      line-height: 1;
+      text-shadow: 0 0 14px rgba(62,234,255,.35);
+    }
+
+    .hp-row {
+      display: flex;
+      gap: 3px;
+      margin-top: 5px;
+    }
+
+    .heart {
+      width: 13px;
+      height: 13px;
+      background: var(--red);
+      transform: rotate(45deg);
+      box-shadow: 0 0 12px rgba(255,52,95,.72);
+    }
+
+    .heart::before,
+    .heart::after {
+      content: "";
+      position: absolute;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: inherit;
+    }
+
+    .heart::before { left: -6px; top: 0; }
+    .heart::after { left: 0; top: -6px; }
+    .heart.empty { background: rgba(255,255,255,.14); box-shadow: none; }
+
+    .message {
+      position: absolute;
+      top: calc(max(10px, env(safe-area-inset-top)) + 80px);
+      left: 16px;
+      right: 16px;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
+      text-align: center;
+      color: #dffaff;
+      font-size: clamp(13px, 3.5vw, 17px);
+      font-weight: 900;
+      letter-spacing: .02em;
+      border: 1px solid rgba(255, 211, 106, .32);
+      border-radius: 16px;
+      background: rgba(4, 10, 25, .58);
+      box-shadow: 0 0 20px rgba(255, 211, 106, .08);
+      z-index: 11;
+      pointer-events: none;
+    }
+
+    canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+    }
+
+    .controls {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: max(12px, env(safe-area-inset-bottom));
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      padding: 0 18px;
+      z-index: 14;
+      pointer-events: none;
+    }
+
+    .move-btn {
+      height: clamp(72px, 18vw, 98px);
+      border: 1px solid rgba(94, 238, 255, .55);
+      border-radius: 24px;
+      color: var(--white);
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,.22), transparent 28%),
+        linear-gradient(135deg, rgba(20, 39, 70, .94), rgba(8, 12, 28, .88));
+      box-shadow: 0 0 24px rgba(62,234,255,.18), inset 0 0 22px rgba(62,234,255,.1);
+      font-size: clamp(22px, 7vw, 38px);
+      font-weight: 1000;
+      touch-action: none;
+      pointer-events: auto;
+    }
+
+    .move-btn:active,
+    .move-btn.active {
+      transform: translateY(2px) scale(.98);
+      background: linear-gradient(135deg, rgba(54, 233, 255, .92), rgba(142, 98, 255, .92));
+      color: #06101d;
+      box-shadow: 0 0 34px rgba(62,234,255,.48);
+    }
+
+    .flash {
+      position: absolute;
+      inset: 0;
+      z-index: 13;
+      background: rgba(255, 0, 60, .42);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .flash.on {
+      animation: flash .32s ease-out;
+    }
+
+    @keyframes flash {
+      0% { opacity: .9; }
+      100% { opacity: 0; }
+    }
+
+    .floating {
+      position: absolute;
+      z-index: 15;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--green);
+      font-size: clamp(20px, 7vw, 34px);
+      font-weight: 1000;
+      text-shadow: 0 0 18px rgba(104,255,176,.85);
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .floating.show {
+      animation: floatText 1.1s ease-out;
+    }
+
+    @keyframes floatText {
+      0% { opacity: 0; transform: translate(-50%, -28%) scale(.8); }
+      18% { opacity: 1; transform: translate(-50%, -58%) scale(1.05); }
+      100% { opacity: 0; transform: translate(-50%, -110%) scale(.96); }
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 30;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background:
+        radial-gradient(circle at 50% 24%, rgba(67, 233, 255, .14), transparent 32%),
+        radial-gradient(circle at 80% 80%, rgba(255, 50, 120, .12), transparent 32%),
+        rgba(1, 3, 10, .88);
+      backdrop-filter: blur(8px);
+    }
+
+    .overlay.hidden {
+      display: none;
+    }
+
+    .modal {
+      width: min(100%, 430px);
+      max-height: calc(100dvh - 36px);
+      overflow-y: auto;
+      padding: 26px 20px 20px;
+      border-radius: 28px;
+      border: 1px solid rgba(92, 236, 255, .42);
+      background:
+        linear-gradient(180deg, rgba(14, 24, 50, .94), rgba(5, 8, 20, .92)),
+        radial-gradient(circle at 20% 20%, rgba(62,234,255,.18), transparent 34%);
+      box-shadow: 0 0 60px rgba(62,234,255,.22), inset 0 0 28px rgba(255,255,255,.05);
+    }
+
+    .kicker {
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 1000;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 10px 0 0;
+      color: var(--white);
+      font-size: clamp(42px, 12vw, 68px);
+      line-height: .96;
+      letter-spacing: 0;
+      text-shadow: 0 0 24px rgba(255,75,216,.35), 0 0 36px rgba(62,234,255,.24);
+    }
+
+    .subtitle {
+      margin: 12px 0 0;
+      color: #ffdde8;
+      font-size: clamp(20px, 5vw, 28px);
+      font-weight: 1000;
+    }
+
+    .body-copy {
+      margin: 16px 0 0;
+      color: rgba(240, 248, 255, .84);
+      font-size: 15px;
+      line-height: 1.75;
+      font-weight: 700;
+    }
+
+    .notice {
+      margin: 14px 0 0;
+      padding: 12px;
+      color: #dffaff;
+      font-size: 13px;
+      line-height: 1.65;
+      border: 1px solid rgba(104, 255, 176, .28);
+      border-radius: 16px;
+      background: rgba(24, 255, 170, .08);
+    }
+
+    .primary-btn {
+      width: 100%;
+      margin-top: 18px;
+      min-height: 62px;
+      border: 0;
+      border-radius: 20px;
+      color: #06101a;
+      background: linear-gradient(135deg, #5df3ff, #80ffb2 52%, #ffd36a);
+      box-shadow: 0 0 34px rgba(93, 243, 255, .32), 0 12px 26px rgba(0,0,0,.32);
+      font-size: 21px;
+      font-weight: 1000;
+      letter-spacing: .06em;
+      touch-action: manipulation;
+    }
+
+    .primary-btn:active {
+      transform: translateY(2px) scale(.99);
+    }
+
+    .tips {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .tip {
+      padding: 9px 11px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .055);
+      color: rgba(236, 244, 255, .82);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .danger-final {
+      background: rgba(255, 37, 82, .1);
+      border-color: rgba(255, 63, 94, .36);
+      box-shadow: 0 0 70px rgba(255, 34, 72, .18);
+    }
+
+    .clear-final {
+      background: rgba(68, 255, 177, .1);
+      border-color: rgba(104, 255, 176, .45);
+      box-shadow: 0 0 70px rgba(72, 255, 190, .18);
+    }
+
+    @media (min-width: 680px) {
+      .game-shell {
+        width: min(100vw, 470px);
+        margin: 0 auto;
+        box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 0 70px rgba(62,234,255,.16);
+      }
+    }
+
+    @media (max-height: 650px) {
+      .message {
+        top: calc(max(8px, env(safe-area-inset-top)) + 70px);
+        min-height: 34px;
+        font-size: 12px;
+      }
+      .move-btn {
+        height: 64px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="game-shell" id="shell">
+    <canvas id="game" aria-label="闇バイトから逃げろ！ ゲーム画面"></canvas>
+
+    <section class="hud" aria-label="status">
+      <div class="hud-card">
+        <span>TIME</span>
+        <strong id="timeText">60</strong>
+      </div>
+      <div class="hud-card">
+        <span>HP</span>
+        <div class="hp-row" id="hpRow"></div>
+      </div>
+      <div class="hud-card">
+        <span>SCORE</span>
+        <strong id="scoreText">0</strong>
+      </div>
+    </section>
+
+    <div class="message" id="phaseMessage">怪しいDMが届き始めた…</div>
+    <div class="flash" id="flash"></div>
+    <div class="floating" id="floating">+100</div>
+
+    <section class="controls" aria-label="mobile controls">
+      <button class="move-btn" id="leftBtn" type="button" aria-label="左へ移動">◀</button>
+      <button class="move-btn" id="rightBtn" type="button" aria-label="右へ移動">▶</button>
+    </section>
+
+    <section class="overlay" id="startOverlay">
+      <div class="modal">
+        <div class="kicker">SAFETY RUNNER</div>
+        <h1>闇バイトから逃げろ！</h1>
+        <p class="subtitle">そのDM、押したら終わり。</p>
+        <p class="body-copy">怪しい高額報酬の誘いを避けて、相談・通報・ブロックで逃げ切れ。</p>
+        <p class="notice">これは怪しい勧誘の特徴を学ぶためのミニゲームです。危ないと感じたら、一人で判断せず、信頼できる大人や相談窓口へ。</p>
+        <div class="tips">
+          <div class="tip">スマホ：左右ボタン、またはスワイプで移動</div>
+          <div class="tip">PC：← / A、→ / D で移動</div>
+        </div>
+        <button class="primary-btn" id="startBtn" type="button">START</button>
+      </div>
+    </section>
+
+    <section class="overlay hidden" id="resultOverlay">
+      <div class="modal" id="resultModal">
+        <div class="kicker" id="resultKicker">RESULT</div>
+        <h1 id="resultTitle">逃げ切った！</h1>
+        <p class="subtitle" id="resultSubtitle">安全エリアに到着</p>
+        <p class="body-copy" id="resultBody">「簡単・高額・匿名・秘密」は危険サイン。怪しいと思ったら、一人で判断せず相談しよう。</p>
+        <div class="tips" id="resultStats"></div>
+        <button class="primary-btn" id="retryBtn" type="button">もう一度プレイ</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const canvas = document.getElementById("game");
+      const ctx = canvas.getContext("2d");
+      const shell = document.getElementById("shell");
+      const timeText = document.getElementById("timeText");
+      const scoreText = document.getElementById("scoreText");
+      const hpRow = document.getElementById("hpRow");
+      const phaseMessage = document.getElementById("phaseMessage");
+      const flash = document.getElementById("flash");
+      const floating = document.getElementById("floating");
+      const startOverlay = document.getElementById("startOverlay");
+      const resultOverlay = document.getElementById("resultOverlay");
+      const resultModal = document.getElementById("resultModal");
+      const resultKicker = document.getElementById("resultKicker");
+      const resultTitle = document.getElementById("resultTitle");
+      const resultSubtitle = document.getElementById("resultSubtitle");
+      const resultBody = document.getElementById("resultBody");
+      const resultStats = document.getElementById("resultStats");
+      const leftBtn = document.getElementById("leftBtn");
+      const rightBtn = document.getElementById("rightBtn");
+
+      const dangerWords = [
+        "即日10万円", "誰でも簡単", "身分証送って", "荷物受け取るだけ", "口座貸して",
+        "親に言うな", "絶対バレない", "場所は当日教える", "今日中に返信", "一回だけでOK"
+      ];
+
+      const safeItems = [
+        { label: "ブロック", score: 100, kind: "score" },
+        { label: "相談", score: 150, kind: "score" },
+        { label: "通報", score: 200, kind: "score" },
+        { label: "証拠保存", score: 100, kind: "score" },
+        { label: "#9110", score: 50, kind: "heal" },
+        { label: "家族に話す", score: 120, kind: "shield" },
+        { label: "学校に相談", score: 150, kind: "score" },
+        { label: "警察相談", score: 200, kind: "score" }
+      ];
+
+      const state = {
+        mode: "start",
+        width: 0,
+        height: 0,
+        dpr: 1,
+        elapsed: 0,
+        last: 0,
+        hp: 3,
+        score: 0,
+        invincible: 0,
+        shake: 0,
+        spawnTimer: 0,
+        safeTimer: 1.1,
+        roadOffset: 0,
+        neonOffset: 0,
+        items: [],
+        particles: [],
+        popups: [],
+        input: { left: false, right: false },
+        swipeStartX: null,
+        swipeLastX: null,
+        messageTimer: 0,
+        currentMessage: "怪しいDMが届き始めた…",
+        player: {
+          x: 0,
+          y: 0,
+          w: 48,
+          h: 72,
+          speed: 390,
+          run: 0
+        }
+      };
+
+      const shadowPursuer = {
+        distance: 1,
+        pulse: 0,
+        warning: 0
+      };
+
+      function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      }
+
+      function rand(min, max) {
+        return min + Math.random() * (max - min);
+      }
+
+      function pick(list) {
+        return list[Math.floor(Math.random() * list.length)];
+      }
+
+      function resize() {
+        const rect = shell.getBoundingClientRect();
+        state.width = Math.max(320, Math.floor(rect.width));
+        state.height = Math.max(560, Math.floor(rect.height));
+        state.dpr = Math.min(2, window.devicePixelRatio || 1);
+        canvas.width = Math.floor(state.width * state.dpr);
+        canvas.height = Math.floor(state.height * state.dpr);
+        canvas.style.width = state.width + "px";
+        canvas.style.height = state.height + "px";
+        ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+        state.player.x = clamp(state.player.x || state.width / 2, 42, state.width - 42);
+        state.player.y = state.height - clamp(state.height * .19, 128, 172);
+      }
+
+      function resetGame() {
+        state.mode = "playing";
+        state.elapsed = 0;
+        state.last = performance.now();
+        state.hp = 3;
+        state.score = 0;
+        state.invincible = 0;
+        state.shake = 0;
+        state.spawnTimer = .6;
+        state.safeTimer = 1.35;
+        state.items = [];
+        state.particles = [];
+        state.popups = [];
+        state.player.x = state.width / 2;
+        state.player.y = state.height - clamp(state.height * .19, 128, 172);
+        shadowPursuer.distance = 1;
+        shadowPursuer.pulse = 0;
+        shadowPursuer.warning = 0;
+        setMessage("怪しいDMが届き始めた…", 3);
+        updateHud();
+        startOverlay.classList.add("hidden");
+        resultOverlay.classList.add("hidden");
+        shell.classList.remove("danger-phase");
+      }
+
+      function updateHud() {
+        const remain = Math.max(0, Math.ceil(60 - state.elapsed));
+        timeText.textContent = String(remain);
+        scoreText.textContent = String(state.score);
+        hpRow.innerHTML = "";
+        for (let i = 0; i < 3; i++) {
+          const h = document.createElement("i");
+          h.className = "heart" + (i >= state.hp ? " empty" : "");
+          hpRow.appendChild(h);
+        }
+      }
+
+      function setMessage(text, seconds = 2) {
+        state.currentMessage = text;
+        state.messageTimer = seconds;
+        phaseMessage.textContent = text;
+      }
+
+      function showFloating(text, good = true) {
+        floating.textContent = text;
+        floating.style.color = good ? "#68ffb0" : "#ff5d78";
+        floating.classList.remove("show");
+        void floating.offsetWidth;
+        floating.classList.add("show");
+      }
+
+      function redFlash() {
+        flash.classList.remove("on");
+        void flash.offsetWidth;
+        flash.classList.add("on");
+        shell.classList.remove("alert");
+        void shell.offsetWidth;
+        shell.classList.add("alert");
+      }
+
+      function difficulty() {
+        if (state.elapsed < 20) {
+          return { speed: 140, dangerEvery: .92, safeEvery: 1.9, multi: 1 };
+        }
+        if (state.elapsed < 40) {
+          return { speed: 185, dangerEvery: .68, safeEvery: 1.75, multi: 1.2 };
+        }
+        return { speed: 230, dangerEvery: .48, safeEvery: 1.65, multi: 1.45 };
+      }
+
+      function spawnDanger() {
+        const diff = difficulty();
+        const label = pick(dangerWords);
+        const w = clamp(label.length * 15 + 54, 118, 212);
+        state.items.push({
+          type: "danger",
+          label,
+          x: rand(18, state.width - w - 18),
+          y: -60,
+          w,
+          h: 46,
+          vy: diff.speed + rand(-8, 28),
+          rot: rand(-.08, .08),
+          pulse: rand(0, 10)
+        });
+        if (diff.multi > 1.25 && Math.random() < .34) {
+          const label2 = pick(dangerWords);
+          const w2 = clamp(label2.length * 15 + 54, 118, 212);
+          state.items.push({
+            type: "danger",
+            label: label2,
+            x: rand(18, state.width - w2 - 18),
+            y: -130,
+            w: w2,
+            h: 46,
+            vy: diff.speed + rand(12, 52),
+            rot: rand(-.08, .08),
+            pulse: rand(0, 10)
+          });
+        }
+      }
+
+      function spawnSafe() {
+        const item = pick(safeItems);
+        const w = clamp(item.label.length * 16 + 48, 92, 172);
+        state.items.push({
+          type: "safe",
+          label: item.label,
+          score: item.score,
+          kind: item.kind,
+          x: rand(18, state.width - w - 18),
+          y: -55,
+          w,
+          h: 42,
+          vy: difficulty().speed * .86,
+          rot: rand(-.06, .06),
+          pulse: rand(0, 10)
+        });
+      }
+
+      function addParticles(x, y, color, count = 12) {
+        for (let i = 0; i < count; i++) {
+          const a = rand(0, Math.PI * 2);
+          const s = rand(50, 210);
+          state.particles.push({
+            x, y,
+            vx: Math.cos(a) * s,
+            vy: Math.sin(a) * s,
+            life: rand(.35, .8),
+            max: .8,
+            color,
+            r: rand(2, 5)
+          });
+        }
+      }
+
+      function addPopup(text, x, y, color) {
+        state.popups.push({ text, x, y, color, life: 1, max: 1 });
+      }
+
+      function intersects(a, b) {
+        return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+      }
+
+      function playerBox() {
+        return {
+          x: state.player.x - state.player.w / 2,
+          y: state.player.y - state.player.h / 2,
+          w: state.player.w,
+          h: state.player.h
+        };
+      }
+
+      function hitDanger(item) {
+        if (state.invincible > 0) {
+          addParticles(item.x + item.w / 2, item.y + item.h / 2, "#79ffce", 18);
+          addPopup("無敵で回避", item.x + item.w / 2, item.y, "#79ffce");
+          return;
+        }
+        state.hp -= 1;
+        shadowPursuer.distance = clamp(shadowPursuer.distance - .34, 0, 1);
+        shadowPursuer.warning = 1.6;
+        state.shake = .35;
+        redFlash();
+        addParticles(item.x + item.w / 2, item.y + item.h / 2, "#ff345f", 24);
+        addPopup("-HP", item.x + item.w / 2, item.y, "#ff5d78");
+        setMessage("追跡者が近づいている…", 2.2);
+        if (state.hp <= 0) {
+          endGame(false);
+        }
+      }
+
+      function collectSafe(item) {
+        state.score += item.score;
+        shadowPursuer.distance = clamp(shadowPursuer.distance + .16, 0, 1);
+        let text = "+" + item.score;
+        if (item.kind === "heal") {
+          const before = state.hp;
+          state.hp = Math.min(3, state.hp + 1);
+          text = before < state.hp ? "HP回復" : "+" + item.score;
+        }
+        if (item.kind === "shield") {
+          state.invincible = 3;
+          text = "3秒無敵";
+        }
+        addParticles(item.x + item.w / 2, item.y + item.h / 2, "#68ffb0", 22);
+        addPopup(text, item.x + item.w / 2, item.y, "#68ffb0");
+        showFloating(text, true);
+        setMessage("いい判断。危ない誘いから距離を取った！", 1.8);
+        updateHud();
+      }
+
+      function endGame(clear) {
+        state.mode = clear ? "clear" : "over";
+        resultOverlay.classList.remove("hidden");
+        resultModal.classList.toggle("clear-final", clear);
+        resultModal.classList.toggle("danger-final", !clear);
+        resultKicker.textContent = clear ? "CLEAR" : "GAME OVER";
+        resultTitle.textContent = clear ? "逃げ切った！" : "追跡者に追いつかれた…";
+        resultSubtitle.textContent = clear ? "安全エリアに到着" : "危険サインを見逃した";
+        resultBody.textContent = clear
+          ? "『簡単・高額・匿名・秘密』は危険サイン。怪しいと思ったら、一人で判断せず相談しよう。"
+          : "『身分証送って』『口座貸して』『誰にも言うな』この言葉が出たら要注意。次は安全アイテムを集めて逃げ切ろう。";
+        resultStats.innerHTML = `
+          <div class="tip">SCORE：${state.score}</div>
+          <div class="tip">逃走時間：${Math.min(60, Math.floor(state.elapsed))}秒</div>
+          <div class="tip">覚えておく合言葉：迷ったら相談・通報・ブロック</div>
+        `;
+        document.getElementById("retryBtn").textContent = clear ? "もう一度プレイ" : "リトライ";
+      }
+
+      function update(dt) {
+        if (state.mode !== "playing") return;
+        state.elapsed += dt;
+        state.roadOffset += dt * (260 + state.elapsed * 2.4);
+        state.neonOffset += dt * 36;
+        state.player.run += dt * 10;
+        shadowPursuer.pulse += dt * 5;
+        shadowPursuer.warning = Math.max(0, shadowPursuer.warning - dt);
+        state.invincible = Math.max(0, state.invincible - dt);
+        state.shake = Math.max(0, state.shake - dt);
+
+        if (state.elapsed >= 60) {
+          endGame(true);
+          return;
+        }
+
+        if (state.elapsed > 50) shell.classList.add("danger-phase");
+        else shell.classList.remove("danger-phase");
+
+        if (state.messageTimer > 0) {
+          state.messageTimer -= dt;
+        } else if (state.elapsed < 20) {
+          phaseMessage.textContent = "怪しいDMが届き始めた…";
+        } else if (state.elapsed < 40) {
+          phaseMessage.textContent = "焦らせる言葉に注意！";
+        } else {
+          phaseMessage.textContent = "今だけ・絶対バレない は危険サイン！";
+        }
+
+        const dir = (state.input.left ? -1 : 0) + (state.input.right ? 1 : 0);
+        state.player.x += dir * state.player.speed * dt;
+        state.player.x = clamp(state.player.x, 42, state.width - 42);
+
+        const diff = difficulty();
+        state.spawnTimer -= dt;
+        state.safeTimer -= dt;
+        if (state.spawnTimer <= 0) {
+          spawnDanger();
+          state.spawnTimer = diff.dangerEvery * rand(.72, 1.15);
+        }
+        if (state.safeTimer <= 0) {
+          spawnSafe();
+          state.safeTimer = diff.safeEvery * rand(.8, 1.25);
+        }
+
+        const box = playerBox();
+        for (let i = state.items.length - 1; i >= 0; i--) {
+          const item = state.items[i];
+          item.y += item.vy * dt;
+          item.pulse += dt * 4;
+          if (intersects(box, item)) {
+            state.items.splice(i, 1);
+            if (item.type === "danger") hitDanger(item);
+            else collectSafe(item);
+          } else if (item.y > state.height + 90) {
+            state.items.splice(i, 1);
+          }
+        }
+
+        for (let i = state.particles.length - 1; i >= 0; i--) {
+          const p = state.particles[i];
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.vx *= .97;
+          p.vy *= .97;
+          p.life -= dt;
+          if (p.life <= 0) state.particles.splice(i, 1);
+        }
+
+        for (let i = state.popups.length - 1; i >= 0; i--) {
+          const p = state.popups[i];
+          p.y -= 42 * dt;
+          p.life -= dt;
+          if (p.life <= 0) state.popups.splice(i, 1);
+        }
+
+        updateHud();
+      }
+
+      function roundRect(x, y, w, h, r) {
+        const rr = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + rr, y);
+        ctx.arcTo(x + w, y, x + w, y + h, rr);
+        ctx.arcTo(x + w, y + h, x, y + h, rr);
+        ctx.arcTo(x, y + h, x, y, rr);
+        ctx.arcTo(x, y, x + w, y, rr);
+        ctx.closePath();
+      }
+
+      function drawBackground() {
+        const w = state.width;
+        const h = state.height;
+        const late = state.elapsed > 50;
+        const g = ctx.createLinearGradient(0, 0, 0, h);
+        g.addColorStop(0, late ? "#160817" : "#061427");
+        g.addColorStop(.48, "#030612");
+        g.addColorStop(1, "#08010e");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.save();
+        ctx.globalAlpha = .72;
+        const buildingCount = 7;
+        for (let i = 0; i < buildingCount; i++) {
+          const bw = w / buildingCount + 12;
+          const x = i * (w / buildingCount) - 6;
+          const bh = h * randStatic(i, .24, .48);
+          const y = 92 + (i % 2) * 24;
+          ctx.fillStyle = i % 2 ? "#07101d" : "#050a15";
+          ctx.fillRect(x, y, bw, bh);
+          for (let wy = y + 22; wy < y + bh - 18; wy += 34) {
+            for (let wx = x + 13; wx < x + bw - 12; wx += 26) {
+              if ((Math.floor(wx + wy + i * 7) % 4) === 0) {
+                ctx.fillStyle = i % 3 ? "rgba(63,232,255,.22)" : "rgba(255,75,216,.22)";
+                ctx.fillRect(wx, wy, 9, 4);
+              }
+            }
+          }
+        }
+        ctx.restore();
+
+        drawNeonSign(22, 150 + Math.sin(state.neonOffset * .05) * 4, "DM", "#ff4bd8");
+        drawNeonSign(w - 114, 204, "SAFE", "#68ffb0");
+        drawStreetLight(w - 58, 140);
+        drawRoad();
+      }
+
+      function randStatic(seed, min, max) {
+        const n = Math.sin(seed * 989.123) * 43758.545;
+        return min + (n - Math.floor(n)) * (max - min);
+      }
+
+      function drawNeonSign(x, y, text, color) {
+        ctx.save();
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 18;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        roundRect(x, y, 88, 38, 9);
+        ctx.stroke();
+        ctx.fillStyle = color;
+        ctx.font = "900 18px system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, x + 44, y + 19);
+        ctx.restore();
+      }
+
+      function drawStreetLight(x, y) {
+        ctx.save();
+        ctx.strokeStyle = "rgba(186,219,255,.36)";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, state.height * .7);
+        ctx.stroke();
+        const glow = ctx.createRadialGradient(x - 34, y + 12, 0, x - 34, y + 12, 120);
+        glow.addColorStop(0, "rgba(255,227,145,.22)");
+        glow.addColorStop(1, "transparent");
+        ctx.fillStyle = glow;
+        ctx.fillRect(x - 160, y - 70, 240, 190);
+        ctx.fillStyle = "#ffe294";
+        ctx.shadowColor = "#ffe294";
+        ctx.shadowBlur = 18;
+        ctx.fillRect(x - 58, y, 46, 8);
+        ctx.restore();
+      }
+
+      function drawRoad() {
+        const w = state.width;
+        const h = state.height;
+        const horizon = h * .33;
+        const roadTop = w * .18;
+        ctx.save();
+        ctx.fillStyle = "#030714";
+        ctx.beginPath();
+        ctx.moveTo(w / 2 - roadTop, horizon);
+        ctx.lineTo(w / 2 + roadTop, horizon);
+        ctx.lineTo(w + 70, h);
+        ctx.lineTo(-70, h);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = "rgba(69,231,255,.22)";
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 18; i++) {
+          const y = horizon + ((state.roadOffset + i * 48) % (h - horizon + 120));
+          const scale = (y - horizon) / (h - horizon);
+          ctx.beginPath();
+          ctx.moveTo(w / 2 - roadTop - scale * 280, y);
+          ctx.lineTo(w / 2 + roadTop + scale * 280, y);
+          ctx.stroke();
+        }
+
+        ctx.strokeStyle = "rgba(255,255,255,.45)";
+        ctx.lineWidth = 3;
+        for (let i = 0; i < 8; i++) {
+          const y = horizon + ((state.roadOffset * 1.4 + i * 150) % (h - horizon + 180));
+          const scale = .25 + (y - horizon) / (h - horizon);
+          const len = 32 + scale * 42;
+          ctx.beginPath();
+          ctx.moveTo(w / 2, y);
+          ctx.lineTo(w / 2, y + len);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawPursuer() {
+        const w = state.width;
+        const h = state.height;
+        const closeness = 1 - shadowPursuer.distance;
+        const y = h * (.48 + .23 * shadowPursuer.distance);
+        const scale = .58 + closeness * 1.25;
+        const x = w * (.5 + Math.sin(state.elapsed * 1.2) * .04);
+        const eyeGlow = closeness > .62 || state.elapsed > 50;
+
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(scale, scale);
+        ctx.globalAlpha = .54 + closeness * .38;
+        ctx.shadowColor = eyeGlow ? "#ff174f" : "#000";
+        ctx.shadowBlur = eyeGlow ? 28 : 14;
+        ctx.fillStyle = "rgba(0,0,0,.62)";
+        ctx.beginPath();
+        ctx.ellipse(0, 74, 48, 12, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#050506";
+        roundRect(-30, -8, 60, 92, 18);
+        ctx.fill();
+        ctx.fillStyle = "#090a10";
+        roundRect(-38, 12, 76, 100, 12);
+        ctx.fill();
+        ctx.fillStyle = "#0e1118";
+        ctx.fillRect(-8, 34, 16, 58);
+
+        ctx.fillStyle = "#101216";
+        ctx.beginPath();
+        ctx.arc(0, -34, 24, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(0,0,0,.64)";
+        ctx.fillRect(-28, -42, 56, 22);
+
+        ctx.fillStyle = eyeGlow ? "#ff345f" : "#c4d2e8";
+        ctx.fillRect(-13, -31, 9, 3);
+        ctx.fillRect(5, -31, 9, 3);
+
+        ctx.fillStyle = "#101319";
+        roundRect(26, 22, 14, 28, 4);
+        ctx.fill();
+        ctx.fillStyle = "#3eeaff";
+        ctx.fillRect(29, 26, 8, 13);
+        ctx.restore();
+      }
+
+      function drawPlayer() {
+        const p = state.player;
+        const inv = state.invincible > 0;
+        const bob = Math.sin(p.run) * 3;
+        const leg = Math.sin(p.run) * 8;
+
+        ctx.save();
+        ctx.translate(p.x, p.y + bob);
+        ctx.shadowColor = inv ? "#68ffb0" : "#ffffff";
+        ctx.shadowBlur = inv ? 28 : 16;
+        ctx.fillStyle = "rgba(0,0,0,.34)";
+        ctx.beginPath();
+        ctx.ellipse(0, 40, 38, 9, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = "#1a2234";
+        ctx.lineWidth = 8;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(-8, 18);
+        ctx.lineTo(-20 + leg, 44);
+        ctx.moveTo(10, 18);
+        ctx.lineTo(24 - leg, 44);
+        ctx.stroke();
+        ctx.strokeStyle = "#f8fbff";
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(-20 + leg, 44);
+        ctx.lineTo(-32 + leg, 44);
+        ctx.moveTo(24 - leg, 44);
+        ctx.lineTo(36 - leg, 44);
+        ctx.stroke();
+
+        ctx.fillStyle = "#f9fbff";
+        roundRect(-22, -22, 44, 48, 14);
+        ctx.fill();
+        ctx.fillStyle = "#e5edf8";
+        ctx.beginPath();
+        ctx.moveTo(-23, -20);
+        ctx.quadraticCurveTo(0, -48, 24, -20);
+        ctx.lineTo(14, -12);
+        ctx.quadraticCurveTo(0, -28, -14, -12);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = "#f0c8a8";
+        ctx.beginPath();
+        ctx.arc(0, -25, 13, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#111827";
+        ctx.fillRect(-9, -29, 18, 5);
+
+        ctx.strokeStyle = "#f8fbff";
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(-20, -2);
+        ctx.lineTo(-34, 14);
+        ctx.moveTo(20, -2);
+        ctx.lineTo(34, 12);
+        ctx.stroke();
+        ctx.fillStyle = "#101827";
+        roundRect(29, 2, 12, 19, 4);
+        ctx.fill();
+        ctx.fillStyle = "#44eaff";
+        ctx.fillRect(32, 6, 6, 9);
+
+        if (inv) {
+          ctx.strokeStyle = "rgba(104,255,176,.9)";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, 42, 62, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawItem(item) {
+        ctx.save();
+        ctx.translate(item.x + item.w / 2, item.y + item.h / 2);
+        ctx.rotate(item.rot + Math.sin(item.pulse) * .025);
+        const x = -item.w / 2;
+        const y = -item.h / 2;
+        const isDanger = item.type === "danger";
+        const glow = isDanger ? "#ff345f" : "#68ffb0";
+        ctx.shadowColor = glow;
+        ctx.shadowBlur = isDanger ? 22 : 18;
+        const grad = ctx.createLinearGradient(x, y, x + item.w, y + item.h);
+        if (isDanger) {
+          grad.addColorStop(0, "rgba(72, 11, 34, .95)");
+          grad.addColorStop(.55, "rgba(38, 9, 36, .95)");
+          grad.addColorStop(1, "rgba(150, 25, 90, .92)");
+        } else {
+          grad.addColorStop(0, "rgba(16, 60, 78, .96)");
+          grad.addColorStop(.55, "rgba(15, 85, 68, .94)");
+          grad.addColorStop(1, "rgba(235, 255, 255, .88)");
+        }
+        ctx.fillStyle = grad;
+        roundRect(x, y, item.w, item.h, 13);
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = isDanger ? "rgba(255,74,112,.8)" : "rgba(139,255,210,.8)";
+        ctx.stroke();
+        ctx.fillStyle = isDanger ? "#ffeff4" : "#06121a";
+        ctx.font = "900 15px system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(item.label, 0, 1);
+        ctx.fillStyle = isDanger ? "rgba(255,52,95,.95)" : "rgba(62,234,255,.95)";
+        ctx.beginPath();
+        ctx.arc(x + 18, y + 14, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawParticles() {
+        for (const p of state.particles) {
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, p.life / p.max);
+          ctx.fillStyle = p.color;
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = 12;
+          ctx.fillRect(p.x, p.y, p.r, p.r);
+          ctx.restore();
+        }
+      }
+
+      function drawPopups() {
+        ctx.save();
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = "900 20px system-ui, sans-serif";
+        for (const p of state.popups) {
+          ctx.globalAlpha = Math.max(0, p.life / p.max);
+          ctx.fillStyle = p.color;
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = 16;
+          ctx.fillText(p.text, p.x, p.y);
+        }
+        ctx.restore();
+      }
+
+      function draw() {
+        ctx.save();
+        if (state.shake > 0) {
+          ctx.translate(rand(-5, 5) * state.shake * 3, rand(-4, 4) * state.shake * 3);
+        }
+        drawBackground();
+        drawPursuer();
+        for (const item of state.items) drawItem(item);
+        drawPlayer();
+        drawParticles();
+        drawPopups();
+        if (state.mode === "over") {
+          const g = ctx.createRadialGradient(state.width / 2, state.height * .62, 30, state.width / 2, state.height * .62, state.height);
+          g.addColorStop(0, "rgba(0,0,0,.2)");
+          g.addColorStop(1, "rgba(0,0,0,.86)");
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, state.width, state.height);
+        }
+        if (state.mode === "clear") {
+          const g = ctx.createRadialGradient(state.width / 2, state.height * .45, 0, state.width / 2, state.height * .45, state.height * .62);
+          g.addColorStop(0, "rgba(104,255,176,.2)");
+          g.addColorStop(1, "transparent");
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, state.width, state.height);
+        }
+        ctx.restore();
+      }
+
+      function loop(now) {
+        const dt = Math.min(.033, (now - state.last) / 1000 || 0);
+        state.last = now;
+        update(dt);
+        draw();
+        requestAnimationFrame(loop);
+      }
+
+      function setButton(btn, key, active) {
+        state.input[key] = active;
+        btn.classList.toggle("active", active);
+      }
+
+      function bindHold(btn, key) {
+        const down = e => {
+          e.preventDefault();
+          setButton(btn, key, true);
+        };
+        const up = e => {
+          e.preventDefault();
+          setButton(btn, key, false);
+        };
+        btn.addEventListener("pointerdown", down);
+        btn.addEventListener("pointerup", up);
+        btn.addEventListener("pointercancel", up);
+        btn.addEventListener("pointerleave", up);
+      }
+
+      bindHold(leftBtn, "left");
+      bindHold(rightBtn, "right");
+
+      window.addEventListener("keydown", e => {
+        if (["ArrowLeft", "ArrowRight", "KeyA", "KeyD", "Enter", "Space"].includes(e.code)) e.preventDefault();
+        if (e.code === "ArrowLeft" || e.code === "KeyA") state.input.left = true;
+        if (e.code === "ArrowRight" || e.code === "KeyD") state.input.right = true;
+        if ((e.code === "Enter" || e.code === "Space") && state.mode !== "playing") resetGame();
+      }, { passive: false });
+
+      window.addEventListener("keyup", e => {
+        if (e.code === "ArrowLeft" || e.code === "KeyA") state.input.left = false;
+        if (e.code === "ArrowRight" || e.code === "KeyD") state.input.right = false;
+      });
+
+      shell.addEventListener("pointerdown", e => {
+        state.swipeStartX = e.clientX;
+        state.swipeLastX = e.clientX;
+      });
+
+      shell.addEventListener("pointermove", e => {
+        if (state.mode !== "playing" || state.swipeStartX === null) return;
+        const dx = e.clientX - state.swipeLastX;
+        state.player.x = clamp(state.player.x + dx * 1.1, 42, state.width - 42);
+        state.swipeLastX = e.clientX;
+      });
+
+      shell.addEventListener("pointerup", () => {
+        state.swipeStartX = null;
+        state.swipeLastX = null;
+      });
+
+      document.getElementById("startBtn").addEventListener("click", resetGame);
+      document.getElementById("retryBtn").addEventListener("click", resetGame);
+      window.addEventListener("resize", resize);
+      window.addEventListener("orientationchange", () => setTimeout(resize, 250));
+
+      resize();
+      updateHud();
+      requestAnimationFrame(t => {
+        state.last = t;
+        loop(t);
+      });
+    })();
+  </script>
+</body>
+</html>
